@@ -1,0 +1,198 @@
+<html lang="ru">
+</html>
+<head>
+ <meta charset="utf-8"/>
+ <title>
+  Сводный отчет
+ </title>
+ <style>
+  :root {
+            --green: #97cc64;
+            --light-green: #b6cca1;
+            --red: #fb5a3e;
+            --light-red: #fbb4a8;
+        }
+        body { font-family: 'Arial', sans-serif; padding: 10px 40px; }
+        section { padding: 15px; border-radius: 5px; border: 1px solid #eee; margin-bottom: 15px; }
+        section>h2 { margin-top: 0px; }
+        span.time { color: #999; font-style: italic; float: right; }
+        span.step-time { float: right; color: #555; font-size: 0.8em; font-style: italic; }
+        span.item { padding: 5px; border-radius: 5px; margin-right: 5px; border: 1px solid #eee; }
+        span.item.pass, span.item.fail { color: #FFF; font-weight: bold; border: 0px; }
+        p.fail { background-color: #fb5a3e; padding: 5px; border-radius: 5px; color: #fff; }
+        p.unspecified { background-color: #994f00; padding: 5px; border-radius: 5px; color: #fff; }
+        p.skipped { background-color: #8b8d8f; padding: 5px; border-radius: 5px; color: #fff; }
+        p.description { background-color: #eee; border-radius: 5px; padding: 20px; margin-left: auto; margin-right: auto; display: inline-block; font-weight: bold;}
+        li { padding: 10px; font-family: monospace; border-radius: 5px; margin-bottom: 5px; }
+        li.pass { background-color: var(--light-green); color: #333; }
+        li.fail { background-color: var(--light-red); color: #900; }
+        li.unspecified { background-color: #ffd37f; color: #a30; }
+        li.skipped { background-color: #f5f5f5; color: #333; }
+        li p { margin-bottom: 0px; }
+        footer { color: #999; font-size: 0.8em; }
+        header { text-align: center; }
+        hr { margin: 20px; margin-left: 0px; margin-right: 0px;  border: none; border-top: 1px solid #ccc; }
+        summary { display: flex; cursor: pointer; }
+        summary::-webkit-details-marker { display: none; }
+        * {box-sizing:border-box}
+        .container { width: 100%; background-color: #ddd; border-radius: 5px}
+        .percent { text-align: left; padding-top: 5px; padding-left: 5px; padding-bottom: 5px; color: white; border-radius: 5px; white-space: nowrap; }
+        .pass { background-color: var(--green); }
+        .fail { background-color: var(--red); }
+        table { width: 100%; border-spacing: 0; border-radius: 5px; margin-top: 10px; }
+        th, td { padding: 5px; color: #000; }
+        table.pass { border-bottom: 2px solid var(--green); }
+        table.fail { border-bottom: 2px solid var(--red); }
+        table thead>tr { font-weight: bold; color: #000; }
+        table.pass tbody tr { border-bottom: 1px solid var(--green); }
+        table.fail tbody tr { border-bottom: 1px solid var(--red); }
+        tbody tr:nth-child(odd) { background-color: rgba(1, 1, 1, 0.05); }
+        tbody tr:nth-child(even) { background-color: rgba(1, 1, 1, 0.1); }
+        tbody tr:hover { background-color: rgba(0, 0, 0, 0); }
+        div.info { float: left; width: 30%; }
+        div.results { float: left; width: calc(70% - 20px); margin-left: 20px; padding: 20px; border-radius: 5px; background-color: #fafafa; }
+ </style>
+</head>
+<body>
+ <h2>
+  Здание_1
+ </h2>
+ <a href="C:/Users/ilyas/Desktop/SVLV/BIM/Articles/ids-ifcopenshell/reports\Здание_1.html">
+  Ссылка
+ </a>
+ <div class="container">
+  <div class="fail percent" style="width: 57%;">
+   57%
+  </div>
+ </div>
+ <p>
+  <span class="item fail">
+   Fail
+  </span>
+  <span class="item">
+   Specifications passed:
+   <strong>
+    1
+   </strong>
+   /
+   <strong>
+    5
+   </strong>
+  </span>
+  <span class="item">
+   Requirements passed:
+   <strong>
+    2
+   </strong>
+   /
+   <strong>
+    19
+   </strong>
+  </span>
+  <span class="item">
+   Checks passed:
+   <strong>
+    407
+   </strong>
+   /
+   <strong>
+    709
+   </strong>
+  </span>
+ </p>
+ <hr/>
+ <h2>
+  Здание_2
+ </h2>
+ <a href="C:/Users/ilyas/Desktop/SVLV/BIM/Articles/ids-ifcopenshell/reports\Здание_2.html">
+  Ссылка
+ </a>
+ <div class="container">
+  <div class="fail percent" style="width: 61%;">
+   61%
+  </div>
+ </div>
+ <p>
+  <span class="item fail">
+   Fail
+  </span>
+  <span class="item">
+   Specifications passed:
+   <strong>
+    1
+   </strong>
+   /
+   <strong>
+    5
+   </strong>
+  </span>
+  <span class="item">
+   Requirements passed:
+   <strong>
+    2
+   </strong>
+   /
+   <strong>
+    19
+   </strong>
+  </span>
+  <span class="item">
+   Checks passed:
+   <strong>
+    386
+   </strong>
+   /
+   <strong>
+    632
+   </strong>
+  </span>
+ </p>
+ <hr/>
+ <h2>
+  Здание_3
+ </h2>
+ <a href="C:/Users/ilyas/Desktop/SVLV/BIM/Articles/ids-ifcopenshell/reports\Здание_3.html">
+  Ссылка
+ </a>
+ <div class="container">
+  <div class="fail percent" style="width: 65%;">
+   65%
+  </div>
+ </div>
+ <p>
+  <span class="item fail">
+   Fail
+  </span>
+  <span class="item">
+   Specifications passed:
+   <strong>
+    1
+   </strong>
+   /
+   <strong>
+    5
+   </strong>
+  </span>
+  <span class="item">
+   Requirements passed:
+   <strong>
+    2
+   </strong>
+   /
+   <strong>
+    19
+   </strong>
+  </span>
+  <span class="item">
+   Checks passed:
+   <strong>
+    1022
+   </strong>
+   /
+   <strong>
+    1565
+   </strong>
+  </span>
+ </p>
+ <hr/>
+</body>
