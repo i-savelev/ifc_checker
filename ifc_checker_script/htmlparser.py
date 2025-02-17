@@ -33,7 +33,7 @@ class Parser_html:
         Функция для формирования сводного html документа из отчетов ids
         """
         input_filenames = [os.path.join(input_dir, filename) for filename in os.listdir(input_dir) if filename.endswith(
-            '.html') and 'Сводный' not in filename]  # списковое включение для формирование списка названий файлов с абсолютными путями. При обработке добавляются только файлы html и исключаются файл сводного отчета
+            '.html') and 'Сводный' not in filename]  # Списковое включение для формирование списка названий файлов с абсолютными путями. При обработке добавляются только файлы html и исключаются файл сводного отчета
 
         # Создание документа html и основных тегов
         consolidated_soup = BeautifulSoup('<html lang="ru">', 'html.parser')
@@ -49,7 +49,7 @@ class Parser_html:
 
         title_tag.string = 'Сводный отчет'
 
-        processed_styles = set()  # множество для записи настроек стиля
+        processed_styles = set()  # Множество для записи настроек стиля
 
         for input_filename in input_filenames:  # Цикл для обработки файлов отчетов
             soup = Parser_html.parse_html(input_filename)  # Получение файла html
@@ -62,19 +62,19 @@ class Parser_html:
                     head_tag.append(new_style)
                     processed_styles.add(style_content)
 
-            # получение содержимого тегов <h2> <div> <p>
+            # Получение содержимого тегов <h2> <div> <p>
             h2_tag = soup.find('h2')
             container_div = soup.find('div', {'class': 'container'})
-            p_tag = container_div.find_next('p')  # тег <p>, который расположен после <div>
-
-            # Создание ссылки на файл отчета
-            link_tag = soup.new_tag('a')
-            link_tag['href'] = input_filename
-            link_tag.string = 'Ссылка'
+            p_tag = container_div.find_next('p')  # Тег <p>, который расположен после <div>
 
             # Доабавление имени файла отчета
             html_file_name = os.path.basename(input_filename)
             h2_tag.string = str(html_file_name).replace('.html', '')
+
+            # Создание ссылки на файл отчета
+            link_tag = soup.new_tag('a')
+            link_tag['href'] = html_file_name
+            link_tag.string = 'Ссылка'
 
             # Горизонтальная черта для разделения отчетов
             hr_tag = soup.new_tag("hr")

@@ -36,27 +36,29 @@ class Ifc_help:
         """
         ifc_entitie = ifc_file.by_guid(ifc_id)
         # обработка элемента
-        for rel in ifc_entitie.IsDefinedBy:  # Набор связей с определениями наборов свойств, прикрепленных
-            # к данному объекту
-            if rel.is_a("IfcRelDefinesByProperties"):  # IfcRelDefinesByProperties определяет отношения между
-                # определениями наборов свойств и объектами
-                prop_set = rel.RelatingPropertyDefinition  # Ссылка на определение набора свойств для этого объекта
-                if prop_set.is_a("IfcPropertySet"):  # IfcPropertySet - это контейнер, который содержит
-                    # свойства в дереве свойств
+        for rel in ifc_entitie.IsDefinedBy:  # Набор связей с определениями наборов
+            # свойств, прикрепленных к данному объекту
+            if rel.is_a("IfcRelDefinesByProperties"):  # IfcRelDefinesByProperties
+                # определяет отношения между определениями наборов свойств и объектами
+                prop_set = rel.RelatingPropertyDefinition  # Ссылка на определение
+                # набора свойств для этого объекта
+                if prop_set.is_a("IfcPropertySet"):  # IfcPropertySet - это контейнер,
+                    # который содержит свойства в дереве свойств
                     print('-', f'"{prop_set.Name}"')  # Вывод имени набора свойств
                     for prop in prop_set.HasProperties:
-                        print('------', f'"{prop.Name}: {prop.NominalValue}"')  # Вывод имен и значений свойств
-                        # для всех свойств в наборе
+                        print('------', f'"{prop.Name}: {prop.NominalValue}"')
+                        # Вывод имен и значений свойств для всех свойств в наборе
 
         # Обработка Property Sets из типа элемента (если есть)
-        if hasattr(ifc_entitie, "IsTypedBy") and ifc_entitie.IsTypedBy:  # обработка типа
+        if hasattr(ifc_entitie, "IsTypedBy") and ifc_entitie.IsTypedBy:  # Обработка типа
             for type_rel in ifc_entitie.IsTypedBy:
                 type_entity = type_rel.RelatingType
                 if hasattr(type_entity, "HasPropertySets") and type_entity.HasPropertySets:
                     for prop_set in type_entity.HasPropertySets:
                         if prop_set.is_a("IfcPropertySet"):
                             print('-', f'"{prop_set.Name}" (Тип ifc)')
-                            for prop in prop_set.HasProperties: print('------', f'"{prop.Name}: {prop.NominalValue}"')
+                            for prop in prop_set.HasProperties:
+                                print('------', f'"{prop.Name}: {prop.NominalValue}"')
 
     @staticmethod
     def get_ifc_project_info(ifc_file):

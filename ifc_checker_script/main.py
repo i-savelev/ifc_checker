@@ -2,7 +2,7 @@
 Проверка ifc файлов по требования IDS с помощью ifcopenshell и ifctester
 
 Для формирования исполняемого exe файла необходимо ввеести в консоль слудующую команду:
-pyinstaller --onefile --collect-all ifctester --collect-all ifcopenshell --collect-all bs4 --windowed --name IfcCheck main.py
+pyinstaller --onefile --collect-all ifctester --collect-all ifcopenshell --collect-all bs4 --windowed --name ifc_checker main.py
 """
 
 from interface import Interface
