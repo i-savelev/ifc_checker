@@ -1,6 +1,6 @@
 # ifc_checker
 
-ifc_checker_scrtipt - скрипт для првоерки IFC моделей по требованиям IDS.
+ifc_checker_script - скрипт для првоерки IFC моделей по требованиям IDS.
 Скрипт содержит интерфейс и обладает следующими настройками:
 
 ![Pasted image 20250215202656](https://github.com/user-attachments/assets/9ae44e74-0a82-455a-ab09-f9d61f6cc35e)
