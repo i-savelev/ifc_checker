@@ -1,0 +1,1 @@
+pyinstaller --onefile --collect-all ifctester --collect-all ifcopenshell --collect-all bs4 --windowed --name ifc_checker --add-data "S:\С\Сычев Владислав\Разработка\Готово\IDS\ids.xsd;.\ids.xsd" main.py
