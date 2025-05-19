@@ -13,19 +13,21 @@ class Ifc_help:
         pass
 
     @staticmethod
-    def check_ifc_file(file_path, ids_path_file, report_path_folder):
+    def check_ifc_file(file_path, ids_path_files, report_path_folder):
         """
         Функция проверяет файл ifc по ids и формирует отчет
         """
         if file_path.endswith('.ifc'):
             ifc_file = ifcopenshell.open(file_path)  # Открытие ifc файла
             ifc_file_name = os.path.basename(file_path)  # Получение имени файла
-            ids_file_path = ids_path_file
-            test_ids = ifctester.ids.open(ids_file_path)  # Открытие файла ids
-            test_ids.validate(ifc_file)  # Проверка файла ifc
-            reporter_obj = ifctester.reporter.Html(test_ids)  # Создание отчета
-            reporter_obj.report()
-            reporter_obj.to_file(f'{report_path_folder}/{ifc_file_name.replace('.ifc', '')}.html')  # Запись отчета в файл
+            for ids_file_path in ids_path_files:    # Цикл по всем IDS-файлам
+                test_ids = ifctester.ids.open(ids_file_path)    #Открытие файла ids
+                test_ids.validate(ifc_file)    # Проверка файла ifc
+                reporter_obj = ifctester.reporter.Html(test_ids)    #Создание отчета
+                reporter_obj.report()
+                # Запись отчета в файл с уникальным имененм для каждого IDS-файла
+                ids_file_name = os.path.basename(ids_file_path).replace('.ids', '')
+                reporter_obj.to_file(f'{report_path_folder}/{ifc_file_name.replace(".ifc", "")}_{ids_file_name}.html')
 
     @staticmethod
     def get_property_by_propertySet(ifc_file, ifc_id):
