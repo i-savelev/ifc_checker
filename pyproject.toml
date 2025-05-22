@@ -1,0 +1,12 @@
+[project]
+name = "ifc-checker"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "bs4>=0.0.2",
+    "ifcopenshell>=0.8.2",
+    "ifctester>=0.8.2",
+    "pyinstaller>=6.13.0",
+]

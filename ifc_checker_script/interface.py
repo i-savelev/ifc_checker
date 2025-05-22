@@ -23,12 +23,12 @@ class Interface():
         self.folder_path_2 = filedialog.askdirectory(title="Выберите папку для отчетов")
         self.folder_label_2.config(text=self.folder_path_2)
 
-    def select_file(self):
-        self.file_path = filedialog.askopenfilename(title="Выберите файл")
-        self.file_label.config(text=self.file_path)
+    def select_files(self):
+        self.files_path = filedialog.askopenfilenames(title="Выберите файл")
+        self.file_label.config(text=self.files_path)
 
     def set_button_function(self):
-        self.func(self.files, self.folder_path_1, self.file_path, self.folder_path_2, self.file_list_box)
+        self.func(self.files, self.folder_path_1, self.files_path, self.folder_path_2, self.file_list_box)
 
     def inicialize(self):
         self.root = tk.Tk()
@@ -43,7 +43,7 @@ class Interface():
         self.folder_label_1.grid(row=0, column=1, padx=(10, 10))
 
         # Кнопка выбора файла ids
-        self.file_button = tk.Button(self.root, text="Выбрать файл ids", command=self.select_file)
+        self.file_button = tk.Button(self.root, text="Выбрать файлы ids", command=self.select_files)
         self.file_button.grid(row=1, column=0, padx=(10, 0), pady=10)
 
         # Текст для передачи пути к файлу

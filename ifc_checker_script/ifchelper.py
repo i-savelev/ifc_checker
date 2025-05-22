@@ -25,7 +25,8 @@ class Ifc_help:
             test_ids.validate(ifc_file)  # Проверка файла ifc
             reporter_obj = ifctester.reporter.Html(test_ids)  # Создание отчета
             reporter_obj.report()
-            reporter_obj.to_file(f'{report_path_folder}/{ifc_file_name.replace('.ifc', '')}.html')  # Запись отчета в файл
+            ids_file_name = os.path.basename(ids_path_file).replace('.ids', '')
+            reporter_obj.to_file(f'{report_path_folder}/{ifc_file_name.replace('.ifc', '')}({ids_file_name}).html')  # Запись отчета в файл
 
     @staticmethod
     def get_property_by_propertySet(ifc_file, ifc_id):
