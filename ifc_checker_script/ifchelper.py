@@ -13,9 +13,14 @@ class Ifc_help:
         pass
 
     @staticmethod
-    def check_ifc_file(file_path, ids_path_file, report_path_folder):
+    def check_ifc_file(file_path, ids_path_file, report_path_folder, report_file_name):
         """
         Функция проверяет файл ifc по ids и формирует отчет
+
+        :file_path -- путь к файлу ifc
+        :ids_path_file -- путь к файлу ids
+        :report_path_folder -- папка для сохранения отчета
+        :report_file_name -- имя файла отчета
         """
         if file_path.endswith('.ifc'):
             ifc_file = ifcopenshell.open(file_path)  # Открытие ifc файла
@@ -25,8 +30,7 @@ class Ifc_help:
             test_ids.validate(ifc_file)  # Проверка файла ifc
             reporter_obj = ifctester.reporter.Html(test_ids)  # Создание отчета
             reporter_obj.report()
-            ids_file_name = os.path.basename(ids_path_file).replace('.ids', '')
-            reporter_obj.to_file(f'{report_path_folder}/{ifc_file_name.replace('.ifc', '')}({ids_file_name}).html')  # Запись отчета в файл
+            reporter_obj.to_file(f'{report_path_folder}/{report_file_name}.html')  # Запись отчета в файл
 
     @staticmethod
     def get_property_by_propertySet(ifc_file, ifc_id):
@@ -34,6 +38,9 @@ class Ifc_help:
         Функция для вывода наборов свойств и свойств в виде:
         - PropertySet
         ------ prop.Name: prop.NominalValue
+
+        :ifc_file -- путь к файлу ifc
+        :ifc_id -- guid элемента
         """
         ifc_entitie = ifc_file.by_guid(ifc_id)
         # обработка элемента
@@ -65,6 +72,8 @@ class Ifc_help:
     def get_ifc_project_info(ifc_file):
         """
         Функция для получения информации о проекте
+
+        :ifc_file -- путь к файлу ifc
         """
         ifc_project_by_type = ifc_file.by_type('IfcProject')[0]
         proj_info = ifc_project_by_type.get_info()

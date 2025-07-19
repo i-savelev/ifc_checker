@@ -1,0 +1,14 @@
+{
+    "ids-ifc_mapping": {
+        "test_all": [],
+        "test_AR": [
+            "_AR"
+        ],
+        "test_KR": [
+            "_KR"
+        ],
+        "test_IOS": [
+            "_IOS"
+        ]
+    }
+}
