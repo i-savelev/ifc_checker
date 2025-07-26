@@ -17,10 +17,10 @@ class Ifc_help:
         """
         Функция проверяет файл ifc по ids и формирует отчет
 
-        :file_path -- путь к файлу ifc
-        :ids_path_file -- путь к файлу ids
-        :report_path_folder -- папка для сохранения отчета
-        :report_file_name -- имя файла отчета
+        - file_path: путь к файлу ifc
+        - ids_path_file: путь к файлу ids
+        - report_path_folder: папка для сохранения отчета
+        - report_file_name: имя файла отчета
         """
         if file_path.endswith('.ifc'):
             ifc_file = ifcopenshell.open(file_path)  # Открытие ifc файла
@@ -39,8 +39,8 @@ class Ifc_help:
         - PropertySet
         ------ prop.Name: prop.NominalValue
 
-        :ifc_file -- путь к файлу ifc
-        :ifc_id -- guid элемента
+        - ifc_file: путь к файлу ifc
+        - ifc_id: guid элемента
         """
         ifc_entitie = ifc_file.by_guid(ifc_id)
         # обработка элемента
@@ -73,7 +73,7 @@ class Ifc_help:
         """
         Функция для получения информации о проекте
 
-        :ifc_file -- путь к файлу ifc
+        - ifc_file: путь к файлу ifc
         """
         ifc_project_by_type = ifc_file.by_type('IfcProject')[0]
         proj_info = ifc_project_by_type.get_info()

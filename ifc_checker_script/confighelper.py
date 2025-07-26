@@ -4,7 +4,7 @@ def save_json_config_template(path_to_save):
     '''
     Сохранение шаблона конфигурации
 
-    :path_to_save -- путь для сохранения файла json
+    - path_to_save: путь для сохранения файла json
     '''
     data = {
         "ids-ifc_mapping": 
@@ -34,7 +34,7 @@ def read_json_config(config_path):
     '''
     получения словаря конфигурации из json
 
-    :config_path -- путь к файлу конфигурации
+    - config_path: путь к файлу конфигурации
     '''
     with open(config_path, "r", encoding="utf-8") as f:
         data = json.load(f)
@@ -44,12 +44,12 @@ def read_json_config(config_path):
 def ifc_exist_in_ids_dict(ids_file, ifc_file, json_config):
     '''
     проверка:
-    - содержится ли ids файл в конфиге
-    - содержатся ли строки из конигурации названии файла ifc
+        - содержится ли ids файл в конфиге
+        - содержатся ли строки из конигурации названии файла ifc
 
-    :ids_file -- название ids файла
-    :ifc_file -- название ifc файла
-    :json_config -- словарь конфигурации, полученный с помощью "read_json_config()"
+    - ids_file: название ids файла
+    - ifc_file: название ifc файла
+    - json_config: словарь конфигурации, полученный с помощью "read_json_config()"
     '''
     value = False
     if ids_file in json_config:

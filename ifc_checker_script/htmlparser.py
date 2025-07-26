@@ -15,7 +15,7 @@ class Parser_html:
         """
         Функция для получения файла html c помощью библиотеки BeautifulSoup
 
-        :file_path -- путь к файлу html
+        - file_path: путь к файлу html
         """
         with open(file_path, 'r', encoding='utf-8') as f:
             soup = BeautifulSoup(f.read(), 'html.parser')
@@ -26,8 +26,8 @@ class Parser_html:
         """
         Функция для сохранения файла html
 
-        :soup -- объект BeautifulSoup
-        :output_filename -- папка для сохранения
+        - soup: объект BeautifulSoup
+        - output_filename: папка для сохранения
         """
         with open(output_filename, 'w', encoding='utf-8') as f:
             f.write(soup.prettify())
@@ -37,9 +37,9 @@ class Parser_html:
         """
         Функция для формирования сводного html документа из отчетов ids
 
-        :input_filenames -- список путей к файлам html
-        :output_dir -- папка для сохранения отчета
-        :output_filename -- имя файла отчета
+        - input_filenames: список путей к файлам html
+        - output_dir: папка для сохранения отчета
+        - output_filename: имя файла отчета
         """
         consolidated_soup = BeautifulSoup('<html lang="ru">', 'html.parser')
         head_tag = BeautifulSoup().new_tag('head')
@@ -98,8 +98,8 @@ class Parser_html:
         '''
         Добавления названия  файла ifc в заголовок html страницы
 
-        :file_name -- имя файла ifc
-        :file_path -- путь к файлу html
+        - file_name: имя файла ifc
+        - file_path: путь к файлу html
         '''
         soup = Parser_html.parse_html(file_path)
         h2_tag = soup.new_tag('h2')
