@@ -1,0 +1,62 @@
+==================================================
+СКРИПТ: IFC_Checker
+ЗАПУСК: 2026-01-18 17:53:59
+==================================================
+2026-01-18 17:53:59 | INFO     | interface.py:78 | check_ifc | Начало проверки IFC
+--------------------------------------------------------------------------------
+2026-01-18 17:53:59 | INFO     | interface.py:82 | check_ifc | Папка IFC: C:/Users/ilyas/Documents/GitHub/ifc_checker/samples/ifc_models
+2026-01-18 17:53:59 | INFO     | interface.py:83 | check_ifc | Папка отчетов: C:/Users/ilyas/Documents/GitHub/ifc_checker/samples/reports
+2026-01-18 17:53:59 | INFO     | interface.py:84 | check_ifc | Файлы IDS: 4 шт.
+2026-01-18 17:53:59 | INFO     | interface.py:86 | check_ifc |   - C:/Users/ilyas/Documents/GitHub/ifc_checker/samples/test_all.ids
+2026-01-18 17:53:59 | INFO     | interface.py:86 | check_ifc |   - C:/Users/ilyas/Documents/GitHub/ifc_checker/samples/test_AR.ids
+2026-01-18 17:53:59 | INFO     | interface.py:86 | check_ifc |   - C:/Users/ilyas/Documents/GitHub/ifc_checker/samples/test_IOS.ids
+2026-01-18 17:53:59 | INFO     | interface.py:86 | check_ifc |   - C:/Users/ilyas/Documents/GitHub/ifc_checker/samples/test_KR.ids
+2026-01-18 17:53:59 | INFO     | interface.py:90 | check_ifc | Конфигурация загружена
+2026-01-18 17:53:59 | DEBUG    | interface.py:91 | data.check_ifc | ДАННЫЕ [Конфигурация]:
+2026-01-18 17:53:59 | DEBUG    | interface.py:91 | data.check_ifc | Тип: dict, Кол-во: 4
+2026-01-18 17:53:59 | DEBUG    | interface.py:91 | data.check_ifc |    [test_all] = []
+2026-01-18 17:53:59 | DEBUG    | interface.py:91 | data.check_ifc |    [test_AR] = ['_AR']
+2026-01-18 17:53:59 | DEBUG    | interface.py:91 | data.check_ifc |    [test_KR] = ['_KR']
+2026-01-18 17:53:59 | DEBUG    | interface.py:91 | data.check_ifc |    [test_IOS] = ['_IOS']
+--------------------------------------------------------------------------------
+2026-01-18 17:53:59 | INFO     | interface.py:97 | check_ifc | Подсчет файлов для проверки...
+2026-01-18 17:53:59 | INFO     | interface.py:116 | check_ifc | Найдено проверок: 6
+--------------------------------------------------------------------------------
+2026-01-18 17:53:59 | INFO     | interface.py:118 | check_ifc | Начало проверки файлов...
+2026-01-18 17:53:59 | INFO     | interface.py:142 | check_ifc | [1/6] Проверка: Здание_1_AR(test_all)
+2026-01-18 17:53:59 | DEBUG    | interface.py:143 | check_ifc |   IFC: C:/Users/ilyas/Documents/GitHub/ifc_checker/samples/ifc_models\AR\Здание_1_AR.ifc
+2026-01-18 17:53:59 | DEBUG    | interface.py:144 | check_ifc |   IDS: C:/Users/ilyas/Documents/GitHub/ifc_checker/samples/test_all.ids
+2026-01-18 17:54:02 | INFO     | interface.py:161 | check_ifc |   Готово: C:/Users/ilyas/Documents/GitHub/ifc_checker/samples/reports\AR\Здание_1_AR(test_all).html
+2026-01-18 17:54:02 | INFO     | interface.py:142 | check_ifc | [2/6] Проверка: Здание_1_AR(test_AR)
+2026-01-18 17:54:02 | DEBUG    | interface.py:143 | check_ifc |   IFC: C:/Users/ilyas/Documents/GitHub/ifc_checker/samples/ifc_models\AR\Здание_1_AR.ifc
+2026-01-18 17:54:02 | DEBUG    | interface.py:144 | check_ifc |   IDS: C:/Users/ilyas/Documents/GitHub/ifc_checker/samples/test_AR.ids
+2026-01-18 17:54:04 | INFO     | interface.py:161 | check_ifc |   Готово: C:/Users/ilyas/Documents/GitHub/ifc_checker/samples/reports\AR\Здание_1_AR(test_AR).html
+2026-01-18 17:54:04 | DEBUG    | interface.py:138 | check_ifc | Пропуск: Здание_1_AR(test_IOS) (не в конфигурации)
+2026-01-18 17:54:04 | DEBUG    | interface.py:138 | check_ifc | Пропуск: Здание_1_AR(test_KR) (не в конфигурации)
+2026-01-18 17:54:04 | INFO     | interface.py:142 | check_ifc | [3/6] Проверка: Здание_3_IOS(test_all)
+2026-01-18 17:54:04 | DEBUG    | interface.py:143 | check_ifc |   IFC: C:/Users/ilyas/Documents/GitHub/ifc_checker/samples/ifc_models\IOS\Здание_3_IOS.ifc
+2026-01-18 17:54:04 | DEBUG    | interface.py:144 | check_ifc |   IDS: C:/Users/ilyas/Documents/GitHub/ifc_checker/samples/test_all.ids
+2026-01-18 17:54:09 | INFO     | interface.py:161 | check_ifc |   Готово: C:/Users/ilyas/Documents/GitHub/ifc_checker/samples/reports\IOS\Здание_3_IOS(test_all).html
+2026-01-18 17:54:09 | DEBUG    | interface.py:138 | check_ifc | Пропуск: Здание_3_IOS(test_AR) (не в конфигурации)
+2026-01-18 17:54:09 | INFO     | interface.py:142 | check_ifc | [4/6] Проверка: Здание_3_IOS(test_IOS)
+2026-01-18 17:54:09 | DEBUG    | interface.py:143 | check_ifc |   IFC: C:/Users/ilyas/Documents/GitHub/ifc_checker/samples/ifc_models\IOS\Здание_3_IOS.ifc
+2026-01-18 17:54:09 | DEBUG    | interface.py:144 | check_ifc |   IDS: C:/Users/ilyas/Documents/GitHub/ifc_checker/samples/test_IOS.ids
+2026-01-18 17:54:15 | INFO     | interface.py:161 | check_ifc |   Готово: C:/Users/ilyas/Documents/GitHub/ifc_checker/samples/reports\IOS\Здание_3_IOS(test_IOS).html
+2026-01-18 17:54:15 | DEBUG    | interface.py:138 | check_ifc | Пропуск: Здание_3_IOS(test_KR) (не в конфигурации)
+2026-01-18 17:54:15 | INFO     | interface.py:142 | check_ifc | [5/6] Проверка: Здание_2_KR(test_all)
+2026-01-18 17:54:15 | DEBUG    | interface.py:143 | check_ifc |   IFC: C:/Users/ilyas/Documents/GitHub/ifc_checker/samples/ifc_models\KR\Здание_2_KR.ifc
+2026-01-18 17:54:15 | DEBUG    | interface.py:144 | check_ifc |   IDS: C:/Users/ilyas/Documents/GitHub/ifc_checker/samples/test_all.ids
+2026-01-18 17:54:17 | INFO     | interface.py:161 | check_ifc |   Готово: C:/Users/ilyas/Documents/GitHub/ifc_checker/samples/reports\KR\Здание_2_KR(test_all).html
+2026-01-18 17:54:17 | DEBUG    | interface.py:138 | check_ifc | Пропуск: Здание_2_KR(test_AR) (не в конфигурации)
+2026-01-18 17:54:17 | DEBUG    | interface.py:138 | check_ifc | Пропуск: Здание_2_KR(test_IOS) (не в конфигурации)
+2026-01-18 17:54:17 | INFO     | interface.py:142 | check_ifc | [6/6] Проверка: Здание_2_KR(test_KR)
+2026-01-18 17:54:17 | DEBUG    | interface.py:143 | check_ifc |   IFC: C:/Users/ilyas/Documents/GitHub/ifc_checker/samples/ifc_models\KR\Здание_2_KR.ifc
+2026-01-18 17:54:17 | DEBUG    | interface.py:144 | check_ifc |   IDS: C:/Users/ilyas/Documents/GitHub/ifc_checker/samples/test_KR.ids
+2026-01-18 17:54:18 | INFO     | interface.py:161 | check_ifc |   Готово: C:/Users/ilyas/Documents/GitHub/ifc_checker/samples/reports\KR\Здание_2_KR(test_KR).html
+--------------------------------------------------------------------------------
+2026-01-18 17:54:18 | INFO     | interface.py:172 | check_ifc | Формирование сводного отчета...
+2026-01-18 17:54:21 | INFO     | interface.py:178 | check_ifc | Сводный отчет создан
+2026-01-18 17:54:21 | INFO     | interface.py:179 | check_ifc | Всего отчетов: 6 шт.
+--------------------------------------------------------------------------------
+2026-01-18 17:54:21 | INFO     | interface.py:189 | check_ifc | Проверка завершена
+2026-01-18 17:54:21 | INFO     | interface.py:191 | check_ifc | Лог сохранен: C:\Users\ilyas\Documents\GitHub\ifc_checker\samples\reports\ifc_checker.log
