@@ -5,12 +5,17 @@ from ifchelper import Ifc_help
 from htmlparser import Parser_html
 import shutil
 import confighelper
+import webbrowser
 
 class Program():
     configuration = None
 
     def __init__(self):
         ...
+
+    def open_link_github(self, event=None):
+        webbrowser.open("https://github.com/i-savelev/ifc_checker")
+
 
     def select_folder_ifc(self):
         self.folder_path_ifc = filedialog.askdirectory(title="Выберите папку с ifc")
@@ -133,7 +138,7 @@ class Program():
         self.file_label_ids.grid(row=1, column=1, padx=(10, 10))
 
         # Кнопка выбора папки для отчетов
-        self.button_folder_report = tk.Button(self.root, text="Выбрать папку отчетов", command=self.select_folder_report)
+        self.button_folder_report = tk.Button(self.root, text="Выбрать папку отчетов\n(файлы в папке удаляются перед записью)", command=self.select_folder_report)
         self.button_folder_report.grid(row=2, column=0, padx=(10, 0), pady=10)
         self.folder_label_report = tk.Label(self.root, text="", width=80)
         self.folder_label_report.grid(row=2, column=1, padx=(10, 10))
@@ -157,6 +162,12 @@ class Program():
         # Текстовое поле
         self.list_box = tk.Listbox(self.root, height=5, width=100)
         self.list_box.grid(row=5, column=1, padx=(10, 0), pady=10)
+
+        # Ссылка на github
+        self.github_link  = tk.Label(self.root, text="Источник: github.com/i-savelev/ifc_checker", fg="blue", cursor="hand2")
+        self.github_link.grid(row=6, column=0)
+        self.github_link.bind("<Button-1>", self.open_link_github)
+
 
         self.root.mainloop()
 
