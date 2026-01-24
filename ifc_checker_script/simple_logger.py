@@ -3,6 +3,31 @@ import os
 from typing import Optional  # type: ignore
 import inspect
 
+
+class NonLockingFileHandler(logging.FileHandler):
+    """
+    FileHandler который открывает файл только на время записи.
+
+    После каждой записи файл закрывается, что позволяет удалять/перемещать
+    файл лога без ошибок блокировки.
+    """
+
+    def emit(self, record):
+        """Записать лог-сообщение, открывая и закрывая файл для каждой записи."""
+        # Открываем файл
+        if self.stream is None:
+            self.stream = self._open()
+
+        try:
+            # Записываем
+            logging.StreamHandler.emit(self, record)
+            # Сбрасываем буфер
+            self.flush()
+        finally:
+            # Закрываем файл после записи
+            self.close()
+
+
 class Logger:
     """
     Фасад для удобного статического логирования без необходимости создания экземпляров.
@@ -61,7 +86,8 @@ class Logger:
             datefmt='%Y-%m-%d %H:%M:%S'
         )
 
-        file_handler = logging.FileHandler(cls._log_file, encoding='utf-8')
+        # NonLockingFileHandler закрывает файл после каждой записи
+        file_handler = NonLockingFileHandler(cls._log_file, encoding='utf-8', delay=True)
         file_handler.setLevel(cls._level)
         file_handler.setFormatter(formatter)
 
@@ -76,7 +102,7 @@ class Logger:
 
 
     @classmethod
-    def configure(cls, log_file: str = "app.log", level: int = logging.DEBUG) -> None:
+    def configure(cls, log_file: str = "app.log", level: int = logging.INFO) -> None:
         """
         Настраивает параметры логирования до первого использования.
 
@@ -231,7 +257,6 @@ class Logger:
         """
         cls._ensure_initialized()
         cls._get_logger(name).debug(msg=f"ДАННЫЕ [{label}]:", stacklevel=2)
-        print(cls._logger)
 
         if isinstance(data, dict):
             cls._get_logger(name).debug(msg=f"Тип: dict, Кол-во: {len(data)}", stacklevel=2)
