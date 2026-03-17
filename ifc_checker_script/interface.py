@@ -72,7 +72,6 @@ class Program():
         if os.path.exists(self.folder_path_report):
             shutil.rmtree(self.folder_path_report)
             os.makedirs(self.folder_path_report, exist_ok=True)
-
         # Инициализация логгера в папке отчетов
         self._init_logger()
         Logger.info("Начало проверки IFC")
