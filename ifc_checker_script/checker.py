@@ -13,7 +13,7 @@ import shutil
 from collections.abc import Callable, Iterable
 
 from ifc_checker_script import confighelper
-from ifc_checker_script.htmlparser import Parser_html, delete_skipped
+from ifc_checker_script.htmlparser import Parser_html
 from ifc_checker_script.ifchelper import Ifc_help
 from ifc_checker_script.simple_logger import Logger
 
@@ -267,11 +267,13 @@ def check_ifc(
     if delete_empty_checks:
         Logger.separator()
         Logger.info("Удаление пропущенных проверок из HTML-отчетов...")
-        deleted_items_by_file = delete_skipped(folder_path_report)
-        for file_path, deleted_sections_count in deleted_items_by_file.items():
+        deleted_items_by_file = Parser_html.delete_skipped(folder_path_report)
+        for file_path, deleted_data in deleted_items_by_file.items():
             Logger.info(
-                f"Очищен отчет: {file_path}. Удалено секций: {deleted_sections_count}"
+                f"Очищен отчет: {file_path}. Удалено секций: {deleted_data['count']}"
             )
+            for deleted_title in deleted_data['titles']:
+                Logger.info(f"  Удалена пропущенная проверка: {deleted_title}")
         _emit_status(
             status_callback,
             "Пропущенные проверки удалены из HTML-отчетов",
@@ -285,5 +287,12 @@ def check_ifc(
         "summary_report": os.path.join(folder_path_report, "Сводный отчет.html"),
         "log_path": log_path,
         "html_files": html_files,
-        "deleted_skipped_sections": deleted_items_by_file,
+        "deleted_skipped_sections": (
+            None
+            if deleted_items_by_file is None
+            else {
+                file_path: deleted_data["count"]
+                for file_path, deleted_data in deleted_items_by_file.items()
+            }
+        ),
     }

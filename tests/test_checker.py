@@ -15,6 +15,7 @@ from ifc_checker_script import (
     delete_skipped_from_one_html,
     read_json_config,
 )
+from ifc_checker_script.htmlparser import Parser_html
 
 
 class TestCheckerBusinessLogic(unittest.TestCase):
@@ -162,12 +163,20 @@ class TestCheckerBusinessLogic(unittest.TestCase):
             html_path = Path(temp_dir) / "single_report.html"
             html_path.write_text(html_content, encoding="utf-8")
 
-            deleted_sections_count = delete_skipped_from_one_html(str(html_path))
+            deleted_details = Parser_html.delete_skipped_from_one_html(str(html_path))
             updated_html = html_path.read_text(encoding="utf-8")
 
-            self.assertEqual(deleted_sections_count, 1)
+            self.assertEqual(deleted_details["count"], 1)
+            self.assertEqual(deleted_details["titles"], ["Skipped section"])
             self.assertNotIn("Skipped section", updated_html)
             self.assertIn("Passed section", updated_html)
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            html_path = Path(temp_dir) / "single_report.html"
+            html_path.write_text(html_content, encoding="utf-8")
+
+            deleted_sections_count = delete_skipped_from_one_html(str(html_path))
+            self.assertEqual(deleted_sections_count, 1)
 
     def test_delete_skipped_processes_all_html_files_in_folder(self) -> None:
         """Проверяет пакетную очистку HTML-файлов от секций ``skipped``.

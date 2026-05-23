@@ -102,6 +102,29 @@ def _extract_percent_number(percent_value):
     return max(0, min(100, int(normalized_value)))
 
 
+def _get_percent_gradient(percent_number):
+    """Возвращает усеченный градиент для заполненной части шкалы.
+
+    Полная шкала соответствует переходу от красного к зеленому на диапазоне
+    от 0 до 100 процентов. Для заполненной части возвращается только тот
+    участок градиента, который соответствует текущему значению. Например,
+    при 50 процентах градиент будет идти от красного к желтому без зеленого.
+
+    :param percent_number: Числовое значение процента в диапазоне от 0 до 100.
+    :returns: Строка CSS-градиента.
+    """
+
+    if percent_number <= 0:
+        return 'linear-gradient(90deg, hsl(0, 80%, 50%), hsl(0, 80%, 50%))'
+
+    end_hue = int(percent_number * 1.2)
+    return (
+        'linear-gradient('
+        f'90deg, hsl(0, 80%, 50%) 0%, hsl({end_hue}, 80%, 50%) 100%'
+        ')'
+    )
+
+
 def _build_percent_cell(consolidated_soup, percent_value):
     """Создает содержимое ячейки с процентом и мини-шкалой.
 
@@ -111,6 +134,7 @@ def _build_percent_cell(consolidated_soup, percent_value):
     """
 
     percent_number = _extract_percent_number(percent_value)
+    fill_gradient = _get_percent_gradient(percent_number)
     percent_wrapper = consolidated_soup.new_tag('div', attrs={'class': 'percent-cell'})
     percent_label = consolidated_soup.new_tag('div', attrs={'class': 'percent-label'})
     percent_label.string = percent_value
@@ -120,7 +144,7 @@ def _build_percent_cell(consolidated_soup, percent_value):
         'div',
         attrs={
             'class': 'percent-bar-fill',
-            'style': f'width: {percent_number}%;',
+            'style': f'width: {percent_number}%; background: {fill_gradient};',
         },
     )
     percent_bar.append(percent_fill)
@@ -166,22 +190,26 @@ def _build_consolidated_table(consolidated_soup, table_rows):
                 tr_tag.append(model_td)
 
             ids_td = consolidated_soup.new_tag('td')
+            ids_td['class'] = 'ids-cell'
             ids_td.string = row_data['ids_name']
             tr_tag.append(ids_td)
 
             link_td = consolidated_soup.new_tag('td')
+            link_td['class'] = 'link-cell'
             link_tag = consolidated_soup.new_tag('a', href=row_data['link_path'])
             link_tag.string = 'Открыть'
             link_td.append(link_tag)
             tr_tag.append(link_td)
 
             summary_td = consolidated_soup.new_tag('td')
+            summary_td['class'] = 'summary-cell'
             summary_td.append(
                 _build_summary_badges(consolidated_soup, row_data['summary_text'])
             )
             tr_tag.append(summary_td)
 
             percent_td = consolidated_soup.new_tag('td')
+            percent_td['class'] = 'percent-column'
             percent_td.append(
                 _build_percent_cell(consolidated_soup, row_data['percent_value'])
             )
@@ -283,37 +311,54 @@ h1 {
 }
 .summary-table .model-cell {
     font-weight: bold;
+    width: 22%;
+}
+.summary-table .ids-cell {
+    width: 20%;
+    white-space: nowrap;
+}
+.summary-table .link-cell {
+    width: 8%;
+    white-space: nowrap;
+}
+.summary-table .summary-cell {
+    width: 34%;
+}
+.summary-table .percent-column {
+    width: 16%;
 }
 .summary-badges {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 5px;
 }
 .summary-badge {
     display: inline-block;
-    padding: 8px 10px;
-    border-radius: 10px;
+    padding: 4px 7px;
+    border-radius: 7px;
     background-color: #f2f4f7;
     border: 1px solid #d8dee6;
     white-space: nowrap;
+    font-size: 12px;
+    line-height: 1.2;
 }
 .percent-cell {
-    min-width: 120px;
+    min-width: 110px;
 }
 .percent-label {
-    margin-bottom: 6px;
+    margin-bottom: 5px;
     font-weight: bold;
+    font-size: 16px;
 }
 .percent-bar {
     width: 100%;
-    height: 10px;
+    height: 8px;
     background-color: #e5e7eb;
     border-radius: 999px;
     overflow: hidden;
 }
 .percent-bar-fill {
     height: 100%;
-    background: linear-gradient(90deg, #3b82f6 0%, #22c55e 100%);
     border-radius: 999px;
 }
 .summary-table a {
@@ -383,21 +428,27 @@ h1 {
         ``item skipped``.
 
         :param html_path: Путь к HTML-отчету.
-        :returns: Количество удаленных секций.
+        :returns: Словарь с количеством удаленных секций и их названиями.
         """
 
         soup = Parser_html.parse_html(html_path)
-        deleted_sections_count = 0
+        deleted_section_titles = []
 
         for section in soup.find_all('section'):
             skipped_item = section.find('span', class_='item skipped')
             if skipped_item is None:
                 continue
+            section_title = section.find('h2')
+            deleted_section_titles.append(
+                section_title.get_text(' ', strip=True) if section_title is not None else 'Без названия'
+            )
             section.decompose()
-            deleted_sections_count += 1
 
         Parser_html.save_html(soup, html_path)
-        return deleted_sections_count
+        return {
+            'count': len(deleted_section_titles),
+            'titles': deleted_section_titles,
+        }
 
     @staticmethod
     def delete_skipped(folder_path):
@@ -408,7 +459,7 @@ h1 {
 
         :param folder_path: Папка с HTML-отчетами.
         :returns: Словарь, где ключом является путь к файлу, а значением -
-            число удаленных секций.
+            словарь с количеством удаленных секций и их названиями.
         """
 
         deleted_items_by_file = {}
@@ -430,7 +481,7 @@ def delete_skipped_from_one_html(html_path):
     :returns: Количество удаленных секций.
     """
 
-    return Parser_html.delete_skipped_from_one_html(html_path)
+    return Parser_html.delete_skipped_from_one_html(html_path)['count']
 
 
 def delete_skipped(folder_path):
@@ -440,7 +491,10 @@ def delete_skipped(folder_path):
     :returns: Словарь с количеством удаленных секций по каждому файлу.
     """
 
-    return Parser_html.delete_skipped(folder_path)
+    return {
+        file_path: deleted_data['count']
+        for file_path, deleted_data in Parser_html.delete_skipped(folder_path).items()
+    }
 
 
 if __name__ == '__main__':
