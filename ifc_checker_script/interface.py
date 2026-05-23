@@ -1,17 +1,15 @@
 import tkinter as tk
 from tkinter import filedialog
 import os
-import logging
-from ifchelper import Ifc_help
-from htmlparser import Parser_html
-import shutil
-import confighelper
 import webbrowser
-from simple_logger import Logger
+from ifc_checker_script import (
+    check_ifc,
+    read_json_config,
+    save_json_config_template,
+)
 
 class Program():
     configuration = None
-    _logger_initialized = False
 
     def __init__(self):
         ...
@@ -21,12 +19,13 @@ class Program():
 
     def open_report_folder(self):
         """Открыть папку с отчетами в проводнике."""
-        if hasattr(self, 'folder_path_report') and self.folder_path_report:
-            if os.path.exists(self.folder_path_report):
-                os.startfile(self.folder_path_report)
-            else:
-                self.list_box.insert(tk.END, "Папка отчетов не существует")
-
+        if not hasattr(self, "folder_path_report") or not self.folder_path_report:
+            self.list_box.insert(tk.END, "Папка отчетов не указана")
+            return
+        if os.path.exists(self.folder_path_report):
+            os.startfile(self.folder_path_report)
+        else:
+            self.list_box.insert(tk.END, "Папка отчетов не существует")
 
     def select_folder_ifc(self):
         self.folder_path_ifc = filedialog.askdirectory(title="Выберите папку с ifc")
@@ -44,157 +43,39 @@ class Program():
         self.files_path_config = filedialog.askopenfilename(title="Выберите файл json")
         self.file_label_config.config(text=self.files_path_config)
         if self.files_path_config != '':
-            self.configuration = confighelper.read_json_config(self.files_path_config)
+            self.configuration = read_json_config(self.files_path_config)
     
     def save_config_sample(self):
         self.folder_path_save_config = filedialog.asksaveasfilename(
             title="Выберите папку сохранения",
             filetypes=[("JSON Files", "*.json")]
             )
-        confighelper.save_json_config_template(self.folder_path_save_config)
+        save_json_config_template(self.folder_path_save_config)
         self.file_label_config_save.config(text=f'Файл сохранен{self.folder_path_save_config}')
 
-    def _init_logger(self):
-        """Инициализация логгера в папке отчетов."""
-        if not hasattr(self, 'folder_path_report') or not self.folder_path_report:
-            return
-
-        log_path = os.path.join(self.folder_path_report, 'ifc_checker.log')
-        Logger.configure(log_file=log_path, level=logging.DEBUG)
-        Logger.init('IFC_Checker')
-        self._logger_initialized = True
-
     def check_ifc(self):
-        """
-        Функция проверяет модели из указанной папки и выгружает отчеты по каждой модели а так же сводный отчет
-        """
-        html_files = []
-        if os.path.exists(self.folder_path_report):
-            shutil.rmtree(self.folder_path_report)
-            os.makedirs(self.folder_path_report, exist_ok=True)
-        # Инициализация логгера в папке отчетов
-        self._init_logger()
-        Logger.info("Начало проверки IFC")
-        Logger.separator()
-
-        # Логируем входные данные
-        Logger.info(f"Папка IFC: {self.folder_path_ifc}")
-        Logger.info(f"Папка отчетов: {self.folder_path_report}")
-        Logger.info(f"Файлы IDS: {len(self.files_path_ids)} шт.")
-        for ids_file in self.files_path_ids:
-            Logger.info(f"  - {ids_file}")
-
+        """Запускает проверку из UI через публичную функцию модуля."""
         self.list_box.delete(0, tk.END)
-        if self.configuration is not None:
-            Logger.info(f"Конфигурация загружена")
-            Logger.data(self.configuration, label="Конфигурация")
-            print(f'Конфигурация:\n{self.configuration}')
-        else:
-            Logger.info("Конфигурация не указана (проверка всех файлов)")
-
-        Logger.separator()
-        Logger.info("Подсчет файлов для проверки...")
-
-        counter = 0
-        counter_sum = 0
-        for root, dirs, files in os.walk(self.folder_path_ifc):
-            for ifc_file in files:
-                if ifc_file.endswith('.ifc'):
-                    for path_ids_file in self.files_path_ids:
-                        ids_file_name = os.path.basename(path_ids_file).replace('.ids', '')
-                        ifc_file_name = os.path.basename(ifc_file).replace('.ifc', '')
-                        if self.configuration is not None:
-                            if not confighelper.ifc_exist_in_ids_dict(
-                                ids_file_name,
-                                ifc_file_name,
-                                self.configuration
-                                ):
-                                continue
-                        counter_sum += 1
-
-        Logger.info(f"Найдено проверок: {counter_sum}")
-        Logger.separator()
-        Logger.info("Начало проверки файлов...")
-
-        for root, dirs, files in os.walk(self.folder_path_ifc):
-            relative_path = os.path.relpath(root, self.folder_path_ifc)
-            target_path_for_report = os.path.join(self.folder_path_report, relative_path)
-            os.makedirs(target_path_for_report, exist_ok=True)
-            for ifc_file in files:
-                path_ifc_file = os.path.join(root, ifc_file)
-                if path_ifc_file.endswith('.ifc'):
-                    for path_ids_file in self.files_path_ids:
-                        ids_file_name = os.path.basename(path_ids_file).replace('.ids', '')
-                        ifc_file_name = os.path.basename(path_ifc_file).replace('.ifc', '')
-                        report_name = f'{ifc_file_name}({ids_file_name})'
-
-                        if self.configuration is not None:
-                            if not confighelper.ifc_exist_in_ids_dict(
-                                ids_file_name,
-                                ifc_file_name,
-                                self.configuration
-                                ):
-                                Logger.debug(f"Пропуск: {report_name} (не в конфигурации)")
-                                continue
-                        counter += 1
-
-                        Logger.info(f"[{counter}/{counter_sum}] Проверка: {report_name}")
-                        Logger.debug(f"  IFC: {path_ifc_file}")
-                        Logger.debug(f"  IDS: {path_ids_file}")
-
-                        try:
-                            Ifc_help.check_ifc_file(
-                                path_ifc_file,
-                                path_ids_file,
-                                target_path_for_report,
-                                report_name
-                                )
-                            html_file_path = os.path.join(target_path_for_report.rstrip(r'\\.'), f'{report_name}.html')
-                            html_files.append(html_file_path)
-                            Parser_html.add_file_name_to_report(ifc_file_name, html_file_path)
-
-                            self.list_box.insert(
-                                tk.END,
-                                f'[{counter}/{counter_sum}]{report_name}.html - готово'
-                                )
-                            Logger.info(f"  Готово: {html_file_path}")
-                            print(f'[{counter}/{counter_sum}]{html_file_path} - готово')
-                        except Exception as e:
-                            self.list_box.insert(
-                                tk.END,
-                                f'[{counter}/{counter_sum}]!Ошибка: {report_name}.html - {e}'
-                                )
-                            Logger.error(f"  Ошибка: {report_name} - {e}")
-                            print(e)
-
-        Logger.separator()
-        Logger.info("Формирование сводного отчета...")
-
         try:
-            Parser_html.get_consolidated_html(html_files, self.folder_path_report, 'Сводный отчет')
-            self.list_box.insert(tk.END, f'Сводный отчет.html - готово')
-            self.list_box.insert(tk.END, f'Подготовлено отчетов: {counter} шт.')
-            Logger.info(f"Сводный отчет создан")
-            Logger.info(f"Всего отчетов: {counter} шт.")
-            print(f'Сводный отчет.html - готово')
-            print(f'Подготовлено отчетов: {counter} шт.')
-        except Exception as e:
-            self.list_box.insert(tk.END, f'!Ошибка: {e}')
-            Logger.error(f"Ошибка создания сводного отчета: {e}")
-            print(f'Ошибка: {e}')
+            check_ifc(
+                folder_path_ifc=self.folder_path_ifc,
+                files_path_ids=self.files_path_ids,
+                folder_path_report=self.folder_path_report,
+                configuration=self.configuration,
+                status_callback=self._append_status,
+                delete_empty_checks=self.delete_empty_checks_var.get(),
+            )
+        except Exception as error:
+            self.list_box.insert(tk.END, f'!Ошибка: {error}')
 
-        # Вывод пути к логу
-        Logger.separator()
-        Logger.info("Проверка завершена")
-        log_path = Logger.path()
-        Logger.info(f"Лог сохранен: {log_path}")
-
-        self.list_box.insert(tk.END, f'Лог: {log_path}')
-        print(f'Лог: {log_path}')
+    def _append_status(self, message):
+        """Добавляет сообщение о прогрессе в текстовое поле интерфейса."""
+        self.list_box.insert(tk.END, message)
 
     def inicialize(self):
         self.root = tk.Tk()
         self.root.title("Проверка IFC")
+        self.delete_empty_checks_var = tk.BooleanVar(value=False)
 
         # Кнопка выбора папки с файлами ifc
         self.button_folder_ifc = tk.Button(self.root, text="Выбрать папку ifc", command=self.select_folder_ifc)
@@ -226,9 +107,17 @@ class Program():
         self.file_label_config_save = tk.Label(self.root, text="", width=80)
         self.file_label_config_save.grid(row=4, column=1, padx=(10, 10))
 
+        # Галочка очистки пропущенных проверок
+        self.checkbox_delete_empty_checks = tk.Checkbutton(
+            self.root,
+            text="Удалять пропущенные проверки из отчетов",
+            variable=self.delete_empty_checks_var,
+        )
+        self.checkbox_delete_empty_checks.grid(row=5, column=0, padx=(10, 0), pady=10, sticky="w")
+
         # Фрейм для кнопок запуска и открытия папки
         self.frame_buttons = tk.Frame(self.root)
-        self.frame_buttons.grid(row=5, column=0, padx=(10, 0), pady=10)
+        self.frame_buttons.grid(row=6, column=0, padx=(10, 0), pady=10)
 
         # Кнопка для запуска функции
         self.button_function = tk.Button(self.frame_buttons, text="Запустить проверку", command=self.check_ifc)
@@ -240,11 +129,11 @@ class Program():
 
         # Текстовое поле
         self.list_box = tk.Listbox(self.root, height=5, width=100)
-        self.list_box.grid(row=5, column=1, padx=(10, 0), pady=10)
+        self.list_box.grid(row=6, column=1, padx=(10, 0), pady=10)
 
         # Ссылка на github
         self.github_link  = tk.Label(self.root, text="Источник: github.com/i-savelev/ifc_checker", fg="blue", cursor="hand2")
-        self.github_link.grid(row=6, column=0)
+        self.github_link.grid(row=7, column=0)
         self.github_link.bind("<Button-1>", self.open_link_github)
 
 
@@ -257,5 +146,5 @@ if __name__ == '__main__':
     interface.folder_path_report = r''
     root = tk.Tk()
     interface.list_box = tk.Listbox(root, height=5, width=100)
-    interface.configuration = confighelper.read_json_config(r'')
+    interface.configuration = read_json_config(r'')
     interface.check_ifc()

@@ -1,0 +1,26 @@
+# TODO
+
+- status: done
+  task: Вынесена функция проверки IFC в `ifc_checker_script/checker.py`, интерфейс переведен на вызов публичного API пакета
+- status: done
+  task: Убран отдельный модуль `ifc_checker_script/app_api.py`, его функции перенесены в `ifc_checker_script/__init__.py`
+- status: done
+  task: UI-специфичные функции убраны из `ifc_checker_script/__init__.py` и возвращены в `ifc_checker_script/interface.py`
+- status: done
+  task: Добавлен тестовый модуль для проверки бизнес-логики через sample-данные с сохранением результатов в `.output`
+- status: done
+  task: Добавлена папка `notebooks` с ноутбуком по публичному API и отдельным ноутбуком для запуска тестового модуля
+- status: done
+  task: Исправлен `notebooks/run_tests.ipynb`, тесты запускаются через интерпретатор текущего notebook kernel
+- status: done
+  task: Добавлено удаление пропущенных проверок из HTML-отчетов в `htmlparser.py` и опция очистки в `check_ifc`
+- status: done
+  task: Добавлена в `ifc_checker_script/interface.py` галочка для удаления пропущенных проверок
+- status: done
+  task: Изменен формат сводного HTML-отчета на таблицу с моделью, ids, ссылкой, статистикой и процентом заполнения
+- status: done
+  task: Улучшено оформление сводного отчета: статистика разбита на отдельные плашки, добавлена визуальная шкала процента
+- status: done
+  task: Изменена ширина таблицы сводного отчета с 60% на 80%
+- status: done
+  task: Добавлен в сводный HTML-отчет футер со ссылкой на автора `i-savelev`

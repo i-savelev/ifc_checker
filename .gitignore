@@ -10,3 +10,4 @@ wheels/
 # Virtual environments
 .venv
 .files
+.output/

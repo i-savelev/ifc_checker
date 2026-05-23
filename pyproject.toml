@@ -8,5 +8,6 @@ dependencies = [
     "bs4>=0.0.2",
     "ifcopenshell>=0.8.2",
     "ifctester>=0.8.2",
+    "ipykernel>=7.2.0",
     "pyinstaller>=6.13.0",
 ]
