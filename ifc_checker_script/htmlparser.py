@@ -3,35 +3,26 @@ from collections import OrderedDict
 from bs4 import BeautifulSoup
 
 
-def _extract_report_data(input_filename, output_dir):
-    """Извлекает данные для строки сводного отчета из HTML-файла.
-
-    :param input_filename: Путь к отдельному HTML-отчету.
-    :param output_dir: Папка, относительно которой строится ссылка.
-    :returns: Словарь с данными для сводного отчета.
+def _extract_summary_stats(soup: BeautifulSoup) -> tuple[str, str]:
     """
-
-    soup = Parser_html.parse_html(input_filename)
-    h2_tags = soup.find_all('h2')
-    model_name = h2_tags[0].get_text(strip=True) if h2_tags else ''
-
-    file_stem = os.path.splitext(os.path.basename(input_filename))[0]
-    ids_name = file_stem.split('(')[-1].rstrip(')') if '(' in file_stem else file_stem
-
-    container_div = soup.find('div', {'class': 'container'})
+    Извлекает процент и текст Summary из HTML-отчета ifctester.
+    Восстановлена надежная логика поиска, устойчивая к пробелам и структуре DOM.
+    """
     percent_value = ''
+    container_div = soup.find('div', {'class': 'container'})
     if container_div is not None:
         percent_div = container_div.find('div', class_='percent')
         if percent_div is not None:
             percent_value = percent_div.get_text(strip=True)
 
+    summary_text = ''
     summary_h2 = None
-    for h2_tag in h2_tags:
+    # Надежный поиск заголовка Summary (устойчив к пробелам и вложенным тегам)
+    for h2_tag in soup.find_all('h2'):
         if h2_tag.get_text(strip=True) == 'Summary':
             summary_h2 = h2_tag
             break
 
-    summary_text = ''
     if summary_h2 is not None:
         summary_container = summary_h2.find_next_sibling('div', {'class': 'container'})
         if summary_container is not None:
@@ -39,22 +30,24 @@ def _extract_report_data(input_filename, output_dir):
             if summary_paragraph is not None:
                 summary_text = summary_paragraph.get_text(' ', strip=True)
 
+    return summary_text, percent_value
+
+
+def _extract_report_data_from_meta(meta: dict, output_dir: str) -> dict:
+    """Формирует строку сводного отчёта из готовых метаданных."""
+    soup = Parser_html.parse_html(meta["html_path"])
+    summary_text, percent_value = _extract_summary_stats(soup)
+    
     return {
-        'model_name': model_name,
-        'ids_name': ids_name,
-        'link_path': os.path.relpath(input_filename, output_dir),
+        'model_name': meta['ifc_name'],
+        'ids_name': meta['ids_name'],
+        'link_path': meta['relative_path'],
         'summary_text': summary_text,
         'percent_value': percent_value,
     }
 
 
 def _split_summary_items(summary_text):
-    """Разбивает строку статистики на отдельные элементы.
-
-    :param summary_text: Строка со статистикой из HTML-отчета.
-    :returns: Список отдельных текстовых элементов статистики.
-    """
-
     labels = ['Specifications passed:', 'Requirements passed:', 'Checks passed:']
     positions = []
     for label in labels:
@@ -74,13 +67,6 @@ def _split_summary_items(summary_text):
 
 
 def _build_summary_badges(consolidated_soup, summary_text):
-    """Создает набор плашек со статистикой для ячейки таблицы.
-
-    :param consolidated_soup: Корневой объект ``BeautifulSoup``.
-    :param summary_text: Строка со статистикой.
-    :returns: Контейнер с HTML-плашками.
-    """
-
     badges_container = consolidated_soup.new_tag('div', attrs={'class': 'summary-badges'})
     for item_text in _split_summary_items(summary_text):
         badge_tag = consolidated_soup.new_tag('span', attrs={'class': 'summary-badge'})
@@ -90,12 +76,6 @@ def _build_summary_badges(consolidated_soup, summary_text):
 
 
 def _extract_percent_number(percent_value):
-    """Извлекает числовое значение процента из строки.
-
-    :param percent_value: Строка с процентом, например ``57%``.
-    :returns: Целое число процента в диапазоне от 0 до 100.
-    """
-
     normalized_value = percent_value.replace('%', '').strip()
     if not normalized_value.isdigit():
         return 0
@@ -103,17 +83,6 @@ def _extract_percent_number(percent_value):
 
 
 def _get_percent_gradient(percent_number):
-    """Возвращает усеченный градиент для заполненной части шкалы.
-
-    Полная шкала соответствует переходу от красного к зеленому на диапазоне
-    от 0 до 100 процентов. Для заполненной части возвращается только тот
-    участок градиента, который соответствует текущему значению. Например,
-    при 50 процентах градиент будет идти от красного к желтому без зеленого.
-
-    :param percent_number: Числовое значение процента в диапазоне от 0 до 100.
-    :returns: Строка CSS-градиента.
-    """
-
     if percent_number <= 0:
         return 'linear-gradient(90deg, hsl(0, 80%, 50%), hsl(0, 80%, 50%))'
 
@@ -126,13 +95,6 @@ def _get_percent_gradient(percent_number):
 
 
 def _build_percent_cell(consolidated_soup, percent_value):
-    """Создает содержимое ячейки с процентом и мини-шкалой.
-
-    :param consolidated_soup: Корневой объект ``BeautifulSoup``.
-    :param percent_value: Строка с процентом заполнения.
-    :returns: Контейнер с процентом и визуальной шкалой.
-    """
-
     percent_number = _extract_percent_number(percent_value)
     fill_gradient = _get_percent_gradient(percent_number)
     percent_wrapper = consolidated_soup.new_tag('div', attrs={'class': 'percent-cell'})
@@ -154,13 +116,6 @@ def _build_percent_cell(consolidated_soup, percent_value):
 
 
 def _build_consolidated_table(consolidated_soup, table_rows):
-    """Создает HTML-таблицу для сводного отчета.
-
-    :param consolidated_soup: Корневой объект ``BeautifulSoup``.
-    :param table_rows: Список словарей со строками сводного отчета.
-    :returns: HTML-таблица в виде ``Tag``.
-    """
-
     table_wrapper = consolidated_soup.new_tag('div', attrs={'class': 'summary-table-wrapper'})
     table_tag = consolidated_soup.new_tag('table', attrs={'class': 'summary-table'})
     thead_tag = consolidated_soup.new_tag('thead')
@@ -224,44 +179,26 @@ def _build_consolidated_table(consolidated_soup, table_rows):
 
 
 class Parser_html:
-    """
-    Класс содержит методы для формирвоания сводного отчета html
-    """
-
     def __init__(self):
         pass
 
     @staticmethod
     def parse_html(file_path):
-        """
-        Функция для получения файла html c помощью библиотеки BeautifulSoup
-
-        - file_path: путь к файлу html
-        """
         with open(file_path, 'r', encoding='utf-8') as f:
             soup = BeautifulSoup(f.read(), 'html.parser')
             return soup
 
     @staticmethod
     def save_html(soup, output_filename):
-        """
-        Функция для сохранения файла html
-
-        - soup: объект BeautifulSoup
-        - output_filename: папка для сохранения
-        """
         with open(output_filename, 'w', encoding='utf-8') as f:
             f.write(soup.prettify())
 
     @staticmethod
-    def get_consolidated_html(input_filenames, output_dir, output_filename):
-        """
-        Функция для формирования сводного html документа из отчетов ids
-
-        - input_filenames: список путей к файлам html
-        - output_dir: папка для сохранения отчета
-        - output_filename: имя файла отчета
-        """
+    def get_consolidated_html(
+        report_metadata: list[dict],
+        output_dir: str, 
+        output_filename: str,
+    ) -> None:
         consolidated_soup = BeautifulSoup('<html lang="ru">', 'html.parser')
         head_tag = BeautifulSoup().new_tag('head')
         meta_tag = BeautifulSoup().new_tag('meta', charset='UTF-8')
@@ -269,7 +206,6 @@ class Parser_html:
         body_tag = BeautifulSoup().new_tag('body')
         h1_tag = BeautifulSoup().new_tag('h1')
 
-        # Добавление тегов в документ
         head_tag.append(meta_tag)
         head_tag.append(title_tag)
         consolidated_soup.append(head_tag)
@@ -385,8 +321,8 @@ h1 {
         head_tag.append(summary_style)
 
         table_rows = []
-        for input_filename in input_filenames:
-            table_rows.append(_extract_report_data(input_filename, output_dir))
+        for meta in report_metadata:
+            table_rows.append(_extract_report_data_from_meta(meta, output_dir))
 
         h1_tag.string = 'Сводный отчет'
         footer_tag = BeautifulSoup().new_tag('footer', attrs={'class': 'summary-footer'})
@@ -401,18 +337,11 @@ h1 {
         body_tag.append(footer_tag)
         consolidated_soup.append(body_tag)
 
-        # Сохранение сводного отчета
         output_file_path = f'{output_dir}/{output_filename}.html'
         Parser_html.save_html(consolidated_soup, output_file_path)
 
+    @staticmethod
     def add_file_name_to_report(file_name, file_path):
-        """
-        Добавления названия файла ifc в заголовок html страницы.
-
-        :param file_name: Имя файла IFC.
-        :param file_path: Путь к HTML-отчету.
-        :returns: ``None``.
-        """
         soup = Parser_html.parse_html(file_path)
         h2_tag = soup.new_tag('h2')
         h2_tag.string = file_name
@@ -422,15 +351,6 @@ h1 {
 
     @staticmethod
     def delete_skipped_from_one_html(html_path):
-        """Удаляет из HTML-отчета секции с пропущенными проверками.
-
-        Секция удаляется, если внутри нее найден элемент со статусом
-        ``item skipped``.
-
-        :param html_path: Путь к HTML-отчету.
-        :returns: Словарь с количеством удаленных секций и их названиями.
-        """
-
         soup = Parser_html.parse_html(html_path)
         deleted_section_titles = []
 
@@ -452,16 +372,6 @@ h1 {
 
     @staticmethod
     def delete_skipped(folder_path):
-        """Удаляет пропущенные проверки из всех HTML-файлов в папке.
-
-        Функция проходит по всем вложенным директориям и обрабатывает каждый
-        файл с расширением ``.html``.
-
-        :param folder_path: Папка с HTML-отчетами.
-        :returns: Словарь, где ключом является путь к файлу, а значением -
-            словарь с количеством удаленных секций и их названиями.
-        """
-
         deleted_items_by_file = {}
         for root, _, files in os.walk(folder_path):
             for file_name in files:
@@ -475,22 +385,10 @@ h1 {
 
 
 def delete_skipped_from_one_html(html_path):
-    """Удаляет из одного HTML-отчета секции со статусом ``skipped``.
-
-    :param html_path: Путь к HTML-отчету.
-    :returns: Количество удаленных секций.
-    """
-
     return Parser_html.delete_skipped_from_one_html(html_path)['count']
 
 
 def delete_skipped(folder_path):
-    """Удаляет из папки секции со статусом ``skipped`` во всех HTML-файлах.
-
-    :param folder_path: Путь к папке с отчетами.
-    :returns: Словарь с количеством удаленных секций по каждому файлу.
-    """
-
     return {
         file_path: deleted_data['count']
         for file_path, deleted_data in Parser_html.delete_skipped(folder_path).items()
@@ -498,7 +396,6 @@ def delete_skipped(folder_path):
 
 
 if __name__ == '__main__':
-    # Проверка работы функции
-    input_dir = r'c:\Users\...\reports'
-    output_filename = 'Сводный отчет'
-    Parser_html.get_consolidated_html(input_dir, output_filename)
+    # Для ручного тестирования оставлен заглушечный вызов. 
+    # Актуальная сигнатура теперь принимает list[dict], а не str.
+    pass

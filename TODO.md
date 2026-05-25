@@ -38,3 +38,5 @@
   task: Добавлен в `README.md` новый `upd` с описанием изменений API, тестов и сводного отчета
 - status: done
   task: Добавлены в `README.md` отдельные блоки про публичный API, notebooks и тесты
+- status: done
+  task: Анализ изменений в checker.py и htmlparser.py для подготовки коммита
