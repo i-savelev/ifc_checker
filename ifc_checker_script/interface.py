@@ -64,6 +64,7 @@ class Program():
                 configuration=self.configuration,
                 status_callback=self._append_status,
                 delete_empty_checks=self.delete_empty_checks_var.get(),
+                generate_ods=self.generate_ods_var.get(),
             )
         except Exception as error:
             self.list_box.insert(tk.END, f'!Ошибка: {error}')
@@ -76,6 +77,7 @@ class Program():
         self.root = tk.Tk()
         self.root.title("Проверка IFC")
         self.delete_empty_checks_var = tk.BooleanVar(value=False)
+        self.generate_ods_var = tk.BooleanVar(value=False)
 
         # Кнопка выбора папки с файлами ifc
         self.button_folder_ifc = tk.Button(self.root, text="Выбрать папку ifc", command=self.select_folder_ifc)
@@ -114,6 +116,14 @@ class Program():
             variable=self.delete_empty_checks_var,
         )
         self.checkbox_delete_empty_checks.grid(row=5, column=0, padx=(10, 0), pady=10, sticky="w")
+
+        # Галочка генерации ODS-отчётов
+        self.checkbox_generate_ods = tk.Checkbutton(
+            self.root,
+            text="Генерировать отчёты в формате ODS",
+            variable=self.generate_ods_var,
+        )
+        self.checkbox_generate_ods.grid(row=5, column=1, padx=(10, 0), pady=10, sticky="w")
 
         # Фрейм для кнопок запуска и открытия папки
         self.frame_buttons = tk.Frame(self.root)

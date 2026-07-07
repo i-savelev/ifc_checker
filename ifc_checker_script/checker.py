@@ -81,9 +81,11 @@ def check_ifc(
     configuration: dict | None = None,
     status_callback: StatusCallback | None = None,
     delete_empty_checks: bool = False,
+    generate_ods: bool = False,
 ) -> dict:
     normalized_ids_paths = _normalize_ids_paths(files_path_ids)
     html_files: list[str] = []
+    ods_files: list[str] = []
     report_metadata: list[dict] = []
     deleted_items_by_file: dict[str, int] | None = None
 
@@ -104,6 +106,9 @@ def check_ifc(
         print(f"Конфигурация:\n{configuration}")
     else:
         Logger.info("Конфигурация не указана (проверка всех файлов)")
+
+    if generate_ods:
+        Logger.info("Генерация ODS-отчётов включена")
 
     Logger.separator()
     Logger.info("Подсчет файлов для проверки...")
@@ -159,6 +164,21 @@ def check_ifc(
                     
                     Parser_html.add_file_name_to_report(ifc_file_name, html_file_path)
 
+                    if generate_ods:
+                        Logger.debug(f"  Генерация ODS: {report_name}")
+                        Ifc_help.check_ifc_file_to_ods(
+                            path_ifc_file,
+                            path_ids_file,
+                            target_path_for_report,
+                            report_name,
+                        )
+                        ods_file_path = os.path.join(
+                            target_path_for_report.rstrip(r"\\."),
+                            f"{report_name}.ods",
+                        )
+                        ods_files.append(ods_file_path)
+                        Logger.info(f"  ODS готов: {ods_file_path}")
+
                     success_message = f"[{counter}/{counter_sum}]{report_name}.html - готово"
                     _emit_status(status_callback, success_message)
                     Logger.info(f"  Готово: {html_file_path}")
@@ -206,6 +226,10 @@ def check_ifc(
                 Logger.info(f"  Удалена пропущенная проверка: {deleted_title}")
         _emit_status(status_callback, "Пропущенные проверки удалены из HTML-отчетов")
 
+    if generate_ods:
+        Logger.info(f"Создано ODS-отчётов: {len(ods_files)} шт.")
+        _emit_status(status_callback, f"ODS-отчётов: {len(ods_files)} шт.")
+
     _emit_status(status_callback, f"Лог: {log_path}")
     print(f"Лог: {log_path}")
 
@@ -214,6 +238,7 @@ def check_ifc(
         "summary_report": os.path.join(folder_path_report, "Сводный отчет.html"),
         "log_path": log_path,
         "html_files": html_files,
+        "ods_files": ods_files,
         "deleted_skipped_sections": (
             None
             if deleted_items_by_file is None

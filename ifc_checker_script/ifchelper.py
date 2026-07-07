@@ -33,6 +33,23 @@ class Ifc_help:
             reporter_obj.to_file(f'{report_path_folder}/{report_file_name}.html')  # Запись отчета в файл
 
     @staticmethod
+    def check_ifc_file_to_ods(file_path, ids_path_file, report_path_folder, report_file_name):
+        """
+        Функция проверяет файл ifc по ids и формирует отчёт в формате ODS.
+
+        :param file_path: Путь к файлу ifc.
+        :param ids_path_file: Путь к файлу ids.
+        :param report_path_folder: Папка для сохранения отчёта.
+        :param report_file_name: Имя файла отчёта (без расширения).
+        """
+        ifc_file = ifcopenshell.open(file_path)
+        test_ids = ifctester.ids.open(ids_path_file)
+        test_ids.validate(ifc_file)
+        ods_reporter = ifctester.reporter.Ods(test_ids, excel_safe=True)
+        ods_reporter.report()
+        ods_reporter.to_file(f'{report_path_folder}/{report_file_name}.ods')
+
+    @staticmethod
     def get_property_by_propertySet(ifc_file, ifc_id):
         """
         Функция для вывода наборов свойств и свойств в виде:
