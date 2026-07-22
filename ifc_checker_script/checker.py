@@ -6,7 +6,7 @@
 """
 
 from __future__ import annotations
-
+import datetime
 import logging
 import os
 import shutil
@@ -30,10 +30,17 @@ def _normalize_ids_paths(files_path_ids: Iterable[str]) -> list[str]:
     return [path for path in files_path_ids]
 
 
-def _prepare_report_directory(folder_path_report: str) -> None:
-    if os.path.exists(folder_path_report):
-        shutil.rmtree(folder_path_report)
-    os.makedirs(folder_path_report, exist_ok=True)
+def _prepare_report_directory(folder_path_report: str) -> str:
+    """Создает новую подпапку с меткой времени для отчетов.
+
+    :param folder_path_report: Базовая папка для сохранения отчетов.
+    :returns: Абсолютный путь к созданной подпапке с меткой времени.
+    """
+    timestamp = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+    new_folder_name = f"Report_{timestamp}"
+    target_path = os.path.abspath(os.path.join(folder_path_report, new_folder_name))
+    os.makedirs(target_path, exist_ok=True)
+    return target_path
 
 
 def _configure_logger(folder_path_report: str) -> None:
@@ -89,13 +96,13 @@ def check_ifc(
     report_metadata: list[dict] = []
     deleted_items_by_file: dict[str, int] | None = None
 
-    _prepare_report_directory(folder_path_report)
-    _configure_logger(folder_path_report)
+    actual_report_dir = _prepare_report_directory(folder_path_report)
+    _configure_logger(actual_report_dir)
 
     Logger.info("Начало проверки IFC")
     Logger.separator()
     Logger.info(f"Папка IFC: {folder_path_ifc}")
-    Logger.info(f"Папка отчетов: {folder_path_report}")
+    Logger.info(f"Папка отчетов: {actual_report_dir}")
     Logger.info(f"Файлы IDS: {len(normalized_ids_paths)} шт.")
     for ids_file in normalized_ids_paths:
         Logger.info(f"  - {ids_file}")
@@ -120,7 +127,7 @@ def check_ifc(
     counter = 0
     for root, _, files in os.walk(folder_path_ifc):
         relative_path = os.path.relpath(root, folder_path_ifc)
-        target_path_for_report = os.path.join(folder_path_report, relative_path)
+        target_path_for_report = os.path.join(actual_report_dir, relative_path)
         os.makedirs(target_path_for_report, exist_ok=True)
 
         for ifc_file in files:
@@ -195,7 +202,7 @@ def check_ifc(
     try:
         Parser_html.get_consolidated_html(
             report_metadata,
-            folder_path_report,
+            actual_report_dir,
             "Сводный отчет",
         )
         _emit_status(status_callback, "Сводный отчет.html - готово")
@@ -217,7 +224,7 @@ def check_ifc(
     if delete_empty_checks:
         Logger.separator()
         Logger.info("Удаление пропущенных проверок из HTML-отчетов...")
-        deleted_items_by_file = Parser_html.delete_skipped(folder_path_report)
+        deleted_items_by_file = Parser_html.delete_skipped(actual_report_dir)
         for file_path, deleted_data in deleted_items_by_file.items():
             Logger.info(
                 f"Очищен отчет: {file_path}. Удалено секций: {deleted_data['count']}"
@@ -235,7 +242,7 @@ def check_ifc(
 
     return {
         "report_count": counter,
-        "summary_report": os.path.join(folder_path_report, "Сводный отчет.html"),
+        "summary_report": os.path.join(actual_report_dir, "Сводный отчет.html"),
         "log_path": log_path,
         "html_files": html_files,
         "ods_files": ods_files,
