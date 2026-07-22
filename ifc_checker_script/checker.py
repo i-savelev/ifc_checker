@@ -166,7 +166,7 @@ def check_ifc(
                         "html_path": html_file_path,
                         "ifc_name": ifc_file_name,
                         "ids_name": ids_file_name,
-                        "relative_path": os.path.relpath(html_file_path, folder_path_report),
+                        "relative_path": os.path.relpath(html_file_path, actual_report_dir),
                     })
                     
                     Parser_html.add_file_name_to_report(ifc_file_name, html_file_path)
